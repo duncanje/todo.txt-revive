@@ -1,0 +1,44 @@
+#!/bin/bash
+
+function usage {
+	cat <<-END
+		revive - Restore tasks from done.txt
+			
+		Usage:
+		    revive
+		        List available todos to revive
+				
+		    revive ITEM#
+		        Revive specified todo
+		END
+	
+	exit 0
+}
+
+function listAvailableTodos {
+	$TODO_FULL_SH listfile "$TODO_DIR/done.txt"
+	
+	exit 0
+}
+
+function reviveTodo {
+	getTodo "$1" "$TODO_DIR/done.txt"
+	cleanTodo=$(echo "$todo" | sed -r 's/x [0-9]{4}-[0-9]{2}-[0-9]{2} //')
+	$TODO_FULL_SH add "$cleanTodo"
+	
+	exit 0
+}
+
+if [ "$1" == "usage" ]; then
+	usage
+fi
+
+shift
+
+if [ -z "$1" ]; then
+	listAvailableTodos
+elif [[ "$1" =~ [0-9]+ ]]; then
+	reviveTodo "$1"
+else
+	usage
+fi
